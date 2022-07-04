@@ -41,36 +41,6 @@ LOCK TABLES `categoria` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `libro`
---
-
-DROP TABLE IF EXISTS `libro`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `libro` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(100) NOT NULL,
-  `descripcion` varchar(250) NOT NULL,
-  `categoria_id` int(11) NOT NULL,
-  `persona_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `FK_Libro_Categoria` (`categoria_id`),
-  KEY `FK_Libro_Persona` (`persona_id`),
-  CONSTRAINT `FK_Libro_Categoria` FOREIGN KEY (`categoria_id`) REFERENCES `categoria` (`id`),
-  CONSTRAINT `FK_Libro_Persona` FOREIGN KEY (`persona_id`) REFERENCES `persona` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `libro`
---
-
-LOCK TABLES `libro` WRITE;
-/*!40000 ALTER TABLE `libro` DISABLE KEYS */;
-/*!40000 ALTER TABLE `libro` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `persona`
 --
 
@@ -106,3 +76,32 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2021-01-03  3:38:38
+--
+-- Table structure for table `libro`
+--
+
+DROP TABLE IF EXISTS `libro`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `libro` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) NOT NULL,
+  `descripcion` varchar(250) NOT NULL,
+  `categoria_id` int(11) NOT NULL,
+  `persona_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_Libro_Categoria` (`categoria_id`),
+  KEY `FK_Libro_Persona` (`persona_id`),
+  CONSTRAINT `FK_Libro_Categoria` FOREIGN KEY (`categoria_id`) REFERENCES `categoria` (`id`),
+  CONSTRAINT `FK_Libro_Persona` FOREIGN KEY (`persona_id`) REFERENCES `persona` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `libro`
+--
+
+LOCK TABLES `libro` WRITE;
+/*!40000 ALTER TABLE `libro` DISABLE KEYS */;
+/*!40000 ALTER TABLE `libro` ENABLE KEYS */;
+UNLOCK TABLES;

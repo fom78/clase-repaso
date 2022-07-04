@@ -1,15 +1,14 @@
 const express = require('express');
+const morgan = require('morgan');
 const mysql = require('mysql');
 const util = require('util');
 const cors = require('cors');
-const { Console } = require('console');
-const { appendFile } = require('fs');
-const { query } = require('express');
 
-const practica = express();
-const port = 3000;
-practica.use(express.json()); //permite el mapeo de la peticion json a object js
-practica.use(cors()); //permite filtrar url clientes q puedan peticionar al servidor
+const app = express();
+const port = 4000;
+app.use(express.json()); //permite el mapeo de la peticion json a object js
+app.use(cors()); //permite filtrar url clientes q puedan peticionar al servidor
+app.use(morgan('dev'))
 
 // Conexion con mysql
 const conexion = mysql.createConnection({
@@ -27,7 +26,7 @@ conexion.connect((error)=>{
     console.log('Conexion con la base de datos mysql establecida');
 });
 
-const qy = util.promisify(conexion.query).bind(conexion); // permite el uso de asyn-await en la conexion mysql
+const qy = util.promisify(conexion.query).bind(conexion); // permite el uso de async-await en la conexion mysql
 
 
 /**
@@ -43,7 +42,7 @@ const qy = util.promisify(conexion.query).bind(conexion); // permite el uso de a
  /**
  * CATEGORIA
  */
-practica.get('/categoria', async (req, res) => {
+app.get('/categoria', async (req, res) => {
     try {
         // armo la consulta
         const query = 'SELECT * FROM categoria';
@@ -61,7 +60,7 @@ practica.get('/categoria', async (req, res) => {
      }
 });
 
-practica.get('/categoria/:id', async(req, res) =>{
+app.get('/categoria/:id', async(req, res) =>{
     try {
         // armo la consulta
         const query = 'SELECT * FROM categoria WHERE id = ?';
@@ -81,7 +80,7 @@ practica.get('/categoria/:id', async(req, res) =>{
 
     }
 })
-practica.post('/categoria',  async(req, res) =>{
+app.post('/categoria',  async(req, res) =>{
     try{
         //validar nombre de la categoria
         if(!req.body.nombre){
@@ -108,7 +107,7 @@ practica.post('/categoria',  async(req, res) =>{
     }
 });
  
-practica.delete( '/categoria/:id', async(req, res) =>{
+app.delete( '/categoria/:id', async(req, res) =>{
     try{
         let query= 'SELECT * FROM libro WHERE categoria_id= ?';
 
@@ -142,7 +141,7 @@ practica.delete( '/categoria/:id', async(req, res) =>{
  * persona
  */
   
- practica.post('/persona', async (req, res) => {
+ app.post('/persona', async (req, res) => {
     try {
         // Valido envio de los datos de la persona
         if (!req.body.nombre || !req.body.apellido || !req.body.alias || !req.body.email) {
@@ -162,18 +161,16 @@ practica.delete( '/categoria/:id', async(req, res) =>{
         query = "INSERT INTO persona (nombre,apellido,alias,email) VALUES (?,?,?,?)";
         respuesta = await qy(query, [req.body.nombre,req.body.apellido,req.body.alias,req.body.email]);
 	
-		res.send({'Registro insertado': {"Nombre":req.body.nombre,"Apellido":req.body.apellido,"Alias":req.body.alias,"Email":req.body.email}});//responde todo
+		res.status(200).json({'Registro insertado': {"Nombre":req.body.nombre,"Apellido":req.body.apellido,"Alias":req.body.alias,"Email":req.body.email}});//responde todo
         
     }   
     catch(e){
-        res.status(413).send({"Error": e.message});
+        res.status(412).send({"Error": e.message});
     }
  });    
 
 
-
-
- practica.get('/persona', async (req, res) => {
+ app.get('/persona', async (req, res) => {
     try {
         const query = 'SELECT * FROM persona';
         
@@ -188,8 +185,7 @@ practica.delete( '/categoria/:id', async(req, res) =>{
  });
 
 
-
- practica.get('/persona/:id', async (req, res) => {
+ app.get('/persona/:id', async (req, res) => {
     try {
         const query = 'SELECT * FROM persona WHERE id = ?';
 
@@ -201,7 +197,7 @@ practica.delete( '/categoria/:id', async(req, res) =>{
             throw new Error('No se encuentra esa persona');
         }
 
-        res.send({"respuesta": respuesta});
+        res.send({"respuesta": respuesta[0]});
     }
     catch(e){
         res.status(413).send(e.message);
@@ -209,7 +205,7 @@ practica.delete( '/categoria/:id', async(req, res) =>{
  });
 
 
- practica.put('/persona/:id', async (req, res)=>{
+ app.put('/persona/:id', async (req, res)=>{
     try {
        
        if (!req.body.nombre || !req.body.apellido || !req.body.alias || !req.body.email) {
@@ -247,7 +243,7 @@ practica.delete( '/categoria/:id', async(req, res) =>{
 });
 
 
-practica.delete('/persona/:id', async (req, res) => {
+app.delete('/persona/:id', async (req, res) => {
     try {
        let query = 'SELECT * FROM libro WHERE persona_id = ?';
 
@@ -283,7 +279,7 @@ practica.delete('/persona/:id', async (req, res) => {
  */
 
 
-practica.get('/libro', async (req, res) => {
+app.get('/libro', async (req, res) => {
     try {
         const query = 'SELECT * FROM libro';
         
@@ -298,7 +294,7 @@ practica.get('/libro', async (req, res) => {
 
 
 
- practica.get('/libro/:id', async (req, res) => {
+ app.get('/libro/:id', async (req, res) => {
     try {
         const query = 'SELECT * FROM libro WHERE id = ?';
 
@@ -318,7 +314,7 @@ practica.get('/libro', async (req, res) => {
  });
 
 
- practica.post('/libro', async (req, res) => {
+ app.post('/libro', async (req, res) => {
     try {
         // Valido envio de los datos del libro
         if (!req.body.nombre || !req.body.categoria_id) {
@@ -368,7 +364,7 @@ practica.get('/libro', async (req, res) => {
         // res.status(413).send("Error Inesperado");
     }
  });
-practica.delete('/libro/:id', async(req, res) => {
+app.delete('/libro/:id', async(req, res) => {
         try{
             let query= 'SELECT * FROM libro WHERE id = ?';
 
@@ -398,7 +394,7 @@ practica.delete('/libro/:id', async(req, res) => {
         
     });
 
-practica.put('/libro/:id', async (req, res)=>{
+app.put('/libro/:id', async (req, res)=>{
         try {
            
            if (req.body.nombre != null || req.body.categoria_id != null || req.body.descripcion == null) {
@@ -439,7 +435,7 @@ practica.put('/libro/:id', async (req, res)=>{
     });
     
     
-practica.put('/libro/prestar/:id', async (req, res)=>{
+app.put('/libro/prestar/:id', async (req, res)=>{
         try {
            
            let query = 'SELECT * FROM libro WHERE  id = ?';
@@ -480,7 +476,7 @@ practica.put('/libro/prestar/:id', async (req, res)=>{
     });
     
     
-practica.put('/libro/devolver/:id', async (req, res)=>{
+app.put('/libro/devolver/:id', async (req, res)=>{
         try {
            
            let query = 'SELECT * FROM libro WHERE  id = ?';
@@ -510,7 +506,7 @@ practica.put('/libro/devolver/:id', async (req, res)=>{
 
 
 
-practica.listen(port, ()=>{
+app.listen(port, ()=>{
     console.log('Servidor escuchando' ,port);
 })
 

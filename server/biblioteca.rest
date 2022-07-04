@@ -1,0 +1,37 @@
+
+@host = http://localhost
+@port = 4000
+@url={{host}}:{{port}}/
+
+
+### Agregar una persona
+POST {{url}}persona
+Content-Type: application/json
+
+{
+  "nombre": "Fernanod",
+  "apellido": "Lopez",
+  "alias": "ferlopez",
+  "email": "ferlopezaa@mail.com"
+}
+
+### Obtener todas las personas
+GET {{url}}persona
+
+### Obtener una persona segun id
+GET {{url}}persona/2
+
+
+### Editar una persona segun id
+PUT {{url}}persona/2
+Content-Type: application/json
+
+{
+  "nombre": "FernanodOO",
+  "apellido": "Lopez",
+  "alias": "ferlopez",
+  "email": "ferlopez@mail.com"
+}
+
+### Eliminar una persona segun id
+DELETE {{url}}persona/2
